@@ -46,9 +46,6 @@ class player:
     a = 5
     b = 15
 
-sellPrice = {
-    "basic": randint(player.a, player.b)
-}
 
 class planted:
     phase1 = 0
@@ -201,17 +198,18 @@ def harvest(amount):
             print("You now have ", G, player.pickles, END, " pickle(s) !")
 
 def sell(amount):
+    sellPrice = randint(player.a, player.b)
+    print("\nThe sale price of pickles is at ", G, sellPrice, END, " $ today!")
     if player.pickles == 0:
         print("\nYou don't have any pickles to sell !\n")
         pass
 
     if player.pickles != 0:    
         if amount == "all":
-            print("\nThe sale price of pickles is at ", G, sellPrice["basic"], END, " $ today!")
             ch = input("\nAre you sure you want to sell your pickles? > ")
             
             if ch == "yes":
-                player.money += (player.pickles*sellPrice["basic"])
+                player.money += (player.pickles*sellPrice)
                 print("\nYou sold ", G, player.pickles, END, " pickle(s) !")
                 player.pickles = 0
                 print("You now have ", G, player.money, END, " $ and ", G, player.pickles, END, " pickle(s).")
