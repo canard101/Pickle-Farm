@@ -1,7 +1,7 @@
 from replit import db
 from time import sleep as s
 import os
-from random import randint
+from random import randint, choice
 
 def w():
     s(0.1)
@@ -43,9 +43,11 @@ class player:
     picklesType = "basic"
     festNbr = 0
 
+    a = 5
+    b = 15
+
 sellPrice = {
-    "basic": randint(5,15),
-    "festival": randint(10,20),
+    "basic": randint(player.a, player.b)
 }
 
 class planted:
@@ -59,16 +61,62 @@ class planted:
     
     growing = phase1+phase2+phase3+phase4+phase5+phase6
 
+def choose():
+    cities = ["Montgomery", "Juneau", "Phoenix", "Little Rock", "Sacramento", "Denver", "Hartford", "Dover", "Tallahassee", "Atlanta", "Honolulu", "Boise", "Springfield", "Indianapolis", "Des Moines", "Topeka", "Frankfort", "Baton Rouge", "Augusta"]
+    x = choice(cities)
+
+    return x
+
 class events:
+    events = ["events.extraSeeds()", "events.storm()", "events.festival()", "events.stocksMarketUp()", "events.stocksMarketDown()"]
     def storm():
-        print("Oh no !\n", G, "50%", END, "of your pickles got destroyed because of a storm")
-        planted.phase1 
-
+        print("\nOh no !\n", G, "50%", END, "of your growing pickles got destroyed because of a storm")
+        planted.phase1 = int(planted.phase1 / 2)
+        planted.phase2 = int(planted.phase2 / 2)
+        planted.phase3 = int(planted.phase3 / 2)
+        planted.phase4 = int(planted.phase4 / 2)
+        planted.phase5 = int(planted.phase5 / 2)
+        planted.phase6 = int(planted.phase6 / 2)
+        planted.phase7 = int(planted.phase7 / 2)
+        left_pickles = planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6+planted.phase7
+        print("You now have", G, left_pickles, END, "left pickles...")
+        print("\nBUT !  The government is ready to help you !\nSo they gave you", G, "$5.",  END)
+        player.money += 5
+        del left_pickles
+        input("\nPress enter to continue./")
+        
     def festival():
-        player.festNbr 
+        player.festNbr += 1
         print("\nYay ! ")
-        print("Today")
+        print("Today is the", player.festNbr, "th Pickles Festival of ", choose(), " !")
+        print("They invited you to hold a booth for", G, "$50", END, " !")
+        player.money += 50
+        input("\nPress enter to continue./")
 
+    def stocksMarketUp():
+        print("\nThe pickles stocks market went up !\nYou can now sell your pickles in a range from", G, "$10", END, "to", G,  "$15", END, "!")
+        player.a = 10
+        player.b = 15
+        input("\nPress enter to continue./")
+
+    def stocksMarketDown():
+        print("\nOh no !\nThe pickles stocks market went down...\nNo one wants to buy pickles for more than",G, "$10", END, "now.\nYou can now sell your pickles in a range from", G, "$1", END, "to", G, "$10", END)
+        input("\nPress enter to continue./")
+        
+    def extraSeeds():
+        print("\nYour seeds supplier has extra seeds and decides to give it to you !\nYou got", G, "5", END, "seeds !")
+        player.seeds += 5
+        input("\nPress enter to continue./")
+
+    def taxes():
+        if player.money == 0:
+            pass
+        else:
+            toPay = player.money/5
+            print("\nHey hey hey !\nIt's taxes time !\nYou owe ", G, "$", toPay, END, "to the government\nAnd you're gonna pay it because you're a good citizen !")
+            input("\nPress enter to pay./")
+            player.money -= toPay
+        
 def save(name):
     
   from replit import db
@@ -90,12 +138,12 @@ def load(name):
     print("\nYou've loaded the game with the name ", G, name, END, " !")
     
 def crops():
-    print("\n• Tommorow's crop : ", G, planted.phase6, END)
-    print("• Recolt in 2 days : ", G, planted.phase5, END)
-    print("• Recolt in 3 days : ", G, planted.phase4, END)
-    print("• Recolt in 4 days : ", G, planted.phase3, END)
-    print("• Recolt in 5 days : ", G, planted.phase2, END)
-    print("• Recolt in 6 days : ", G, planted.phase1, END)
+    print("\n• Tomorrow's crop : ", G, planted.phase6, END)
+    print("• Crops in 2 days : ", G, planted.phase5, END)
+    print("• Crops in 3 days : ", G, planted.phase4, END)
+    print("• Crops in 4 days : ", G, planted.phase3, END)
+    print("• Crops in 5 days : ", G, planted.phase2, END)
+    print("• Crops in 6 days : ", G, planted.phase1, END)
     print("\nTOTAL OF GROWING PICKLES : ", G, planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6, END)
 
 def buySeeds(amount, seedPrice):
@@ -116,7 +164,7 @@ def plant(amount):
         if amount == "all":
             planted.phase1 += player.seeds
             print("\nYou planted ", G, player.seeds, END, " pickle(s) !")
-            print("You now have ", G, planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6, END, " pickles growing.")
+            print("You now have ", G, str(planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6), END, " pickles growing.")
             player.seeds = 0
 
         if player.seeds < int(amount):
@@ -127,7 +175,7 @@ def plant(amount):
             player.seeds -= int(amount)
             planted.phase1 += int(amount)
             print("\nYou planted ", G, amount, END, " pickles !")  
-            print("You now have ", planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6, " pickles growing.")
+            print("You now have ", G, planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6, END, " pickles growing.")
 
 def harvest(amount):
     if planted.phase7 == 0:
@@ -183,8 +231,10 @@ def newDay():
     """
     Create a new day
     """
-    event = random.randint(1, 10)
-    
+    event = randint(1, 6)
+    #print(event) #
+    if event == 4:
+        eval(choice(events.events))
     print("\n\n")
     dayEnded = False
     player.day += 1
@@ -201,9 +251,9 @@ def newDay():
     planted.phase2 = 0
     planted.phase2 += planted.phase1
     planted.phase1 = 0
-    a = player.day
-    print("\nDay : ", G, a, END)       
-    print("="*len("Day : "+str(a)))
+    c = player.day
+    print("\nDay : ", G, c, END)       
+    print("="*len("Day : "+str(c)))
     s(0.5)
     print(G, player.money, END, "$")
     s(0.5)
@@ -297,6 +347,9 @@ def newDay():
             print("Load a game you've saved before ! ")
             x = input("\nWhich game do you want to load ? > ")
             load(x)
+
+        if ch.lower() == "qtoub":
+            quit()
                     
         if ch.startswith("sell"):
             try:
@@ -314,6 +367,8 @@ def newDay():
         if ch.lower() == "crops":
             
                 crops()
+
+
 
 print("Pickle")
 w()
