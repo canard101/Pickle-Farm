@@ -101,6 +101,8 @@ class events:
 
     def stocksMarketDown():
         print("\nOh no !\nThe pickles stocks market went down...\nNo one wants to buy pickles for more than",G, "$10", END, "now.\nYou can now sell your pickles in a range from", G, "$1", END, "to", G, "$10", END)
+        player.a = 1
+        player.b = 10
         input("\nPress enter to continue./")
         
     def extraSeeds():
@@ -199,18 +201,17 @@ def harvest(amount):
             print("You now have ", G, player.pickles, END, " pickle(s) !")
 
 def sell(amount):
-    salePrice = randint(5,15)
     if player.pickles == 0:
         print("\nYou don't have any pickles to sell !\n")
         pass
 
     if player.pickles != 0:    
         if amount == "all":
-            print("\nThe sale price of pickles is at ", G, salePrice, END, " $ today!")
+            print("\nThe sale price of pickles is at ", G, sellPrice["basic"], END, " $ today!")
             ch = input("\nAre you sure you want to sell your pickles? > ")
             
             if ch == "yes":
-                player.money += (player.pickles*salePrice)
+                player.money += (player.pickles*sellPrice["basic"])
                 print("\nYou sold ", G, player.pickles, END, " pickle(s) !")
                 player.pickles = 0
                 print("You now have ", G, player.money, END, " $ and ", G, player.pickles, END, " pickle(s).")
@@ -233,7 +234,7 @@ def newDay():
     """
     event = randint(1, 6)
     #print(event) #
-    if event == 4:
+    if event == 3:
         eval(choice(events.events))
     print("\n\n")
     dayEnded = False
