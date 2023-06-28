@@ -375,7 +375,7 @@ w()
 print("Farm")
 print("====")
 w()
-print("\n© jujubier\n")
+print("\n© canard 2023\n")
 
 s(1)
 
