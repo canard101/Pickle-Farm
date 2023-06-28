@@ -1,8 +1,19 @@
-
-from replit import db
+try:
+    from replit import db
+except:
+    pass
 from time import sleep as s
+import platform
 import os
+from os import system as cmd
 from random import randint, choice
+
+def clear(): # Cross-platform console clearer
+  ostype = platform.system()
+  if ostype == "Linux" or ostype == "Darwin":
+    cmd("clear")
+  else:
+    cmd("cls")
 
 def w():
     s(0.1)
@@ -59,6 +70,8 @@ class planted:
     
     growing = phase1+phase2+phase3+phase4+phase5+phase6
 
+sellPrice = 0
+
 def choose():
     cities = ["Montgomery", "Juneau", "Phoenix", "Little Rock", "Sacramento", "Denver", "Hartford", "Dover", "Tallahassee", "Atlanta", "Honolulu", "Boise", "Springfield", "Indianapolis", "Des Moines", "Topeka", "Frankfort", "Baton Rouge", "Augusta"]
     x = choice(cities)
@@ -66,6 +79,7 @@ def choose():
     return x
 
 class events:
+    # Maladie ??
     events = ["events.extraSeeds()", "events.storm()", "events.festival()", "events.stocksMarketUp()", "events.stocksMarketDown()"]
     def storm():
         print("\nOh no !\n", G, "50%", END, "of your growing pickles got destroyed because of a storm")
@@ -85,22 +99,27 @@ class events:
         
     def festival():
         player.festNbr += 1
+        wage = randint(20, 60)
         print("\nYay ! ")
         print("Today is the", player.festNbr, "th Pickles Festival of ", choose(), " !")
-        print("They invited you to hold a booth for", G, "$50", END, " !")
-        player.money += 50
+        print("They invited you to hold a booth for", G, "$" + wage, END, " !")
+        player.money += wage
         input("\nPress enter to continue./")
 
     def stocksMarketUp():
-        print("\nThe pickles stocks market went up !\nYou can now sell your pickles in a range from", G, "$10", END, "to", G,  "$15", END, "!")
-        player.a = 10
-        player.b = 15
+        #global player
+        add = randint(1, 15)
+        player.a += add
+        player.b += add
+        print("\nThe pickles stocks market went up !\nYou can now sell your pickles in a range from", G, "$" + str(player.a), END, "to", G,  "$" + str(player.b), END, "!")
         input("\nPress enter to continue./")
 
     def stocksMarketDown():
-        print("\nOh no !\nThe pickles stocks market went down...\nNo one wants to buy pickles for more than",G, "$10", END, "now.\nYou can now sell your pickles in a range from", G, "$1", END, "to", G, "$10", END)
-        player.a = 1
-        player.b = 10
+        #global player
+        sub = randint(1, 15)
+        player.a -= sub
+        player.b -= sub
+        print("\nOh no !\nThe pickles stocks market went down...\nNo one wants to buy pickles for more than",G, "$" + str(player.b), END, "now.\nYou can now sell your pickles in a range from", G, "$" + str(player.a), END, "to", G,  "$" + player.b, END)
         input("\nPress enter to continue./")
         
     def extraSeeds():
@@ -119,17 +138,23 @@ class events:
         
 def save(name):
     
-  from replit import db
-  
-  db["PCK_"+name] = player.pickles
-  db["MNY_"+name] = player.money
-  db["SDS_"+name] = player.seeds
+    try:
+        from replit import db
+    except:
+        pass
+    
+    db["PCK_"+name] = player.pickles
+    db["MNY_"+name] = player.money
+    db["SDS_"+name] = player.seeds
 
-  print("\nYou've saved the game to the name ", G, name, END, " !")
+    print("\nYou've saved the game to the name ", G, name, END, " !")
 
 def load(name):
 
-    from replit import db
+    try:
+        from replit import db
+    except:
+        pass
 
     player.money = db["MNY_"+name]
     player.pickles = db["PCK_"+name]
@@ -199,8 +224,7 @@ def harvest(amount):
             print("You now have ", G, player.pickles, END, " pickle(s) !")
 
 def sell(amount):
-    sellPrice = randint(player.a, player.b)
-    print("\nThe sale price of pickles is at ", G, sellPrice, END, " $ today!")
+    print("\nThe price of pickles is $", G, sellPrice, END, "today!")
     if player.pickles == 0:
         print("\nYou don't have any pickles to sell !\n")
         pass
@@ -215,15 +239,26 @@ def sell(amount):
                 player.pickles = 0
                 print("You now have ", G, player.money, END, " $ and ", G, player.pickles, END, " pickle(s).")
                 
-            elif ch == "no":
+            else:
                 print("\nOk, maybe another day!")
                 pass
-            else:
-                print("\nAnswer by yes or no!")
             
-        if player.pickles < int(amount):
-            print("You don't have that much pickles to harvest ! You can only harvest ", G, planted.phase7, END, " pickle(s)!")
+        elif player.pickles < int(amount):
+            print("You don't have that much pickles to sell ! You only have ", G, player.pickles, END, " pickle(s)!")
             pass
+            
+        else:
+            ch = input(f"\nAre you sure you want to sell {amount} pickles? > ")
+            
+            if ch == "yes":
+                player.money += (player.pickles*sellPrice)
+                print("\nYou sold ", G, player.pickles, END, " pickle(s) !")
+                player.pickles -= int(amount)
+                print("You now have $", G, player.money, END, " and ", G, player.pickles, END, " pickle(s).")
+                
+            else:
+                print("\nOk, maybe another day!")
+                pass
 
         
     
@@ -231,9 +266,11 @@ def newDay():
     """
     Create a new day
     """
+    global sellPrice
     event = randint(1, 6)
+    sellPrice = randint(player.a, player.b)
     #print(event) #
-    if event == 3:
+    if event == 3 and player.day > 0:
         eval(choice(events.events))
     print("\n\n")
     dayEnded = False
@@ -368,7 +405,7 @@ def newDay():
             
                 crops()
 
-
+clear()
 
 print("Pickle")
 w()
