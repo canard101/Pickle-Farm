@@ -143,7 +143,7 @@ class events:
         sub = randint(1, 15)
         player.a -= sub
         player.b -= sub
-        print("\nOh no !\nThe pickles stocks market went down...\nNo one wants to buy pickles for more than",G, "$" + str(player.b), END, "now.\nYou can now sell your pickles in a range from", G, "$" + str(player.a), END, "to", G,  "$" + player.b, END)
+        print("\nOh no !\nThe pickles stocks market went down...\nNo one wants to buy pickles for more than",G, "$" + str(player.b), END, "now.\nYou can now sell your pickles in a range from", G, "$" + str(player.a), END, "to", G,  "$" + str(player.b), END)
         input("\nPress enter to continue./")
         
     def extraSeeds():
