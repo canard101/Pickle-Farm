@@ -288,17 +288,15 @@ def sell(amount):
                 pass
 
 def checkDebt():
-    if player.money <= 0 and player.pickles == 0 and player.seeds == 0:
+    if player.money <= 0 and player.pickles == 0 and player.seeds == 0 and planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6+planted.phase7 == 0:
         print("Your pickle farm went bankrupt.\nYou don't have anymore money, or pickles, or seeds.\nYou will have to start a new career in another industry.")
         print("\nY O U     L O S T")
         input("\n\nPress enter to quit./")
         quit()
     elif player.money <= 0 and player.pickles == 0 and player.seeds > 0:
         print("Hey! You've got to plant your seeds RIGHT NOW if you don't wanna go bankrupt!")
-        input("\nPress enter to continue.")
     elif player.money <= 0 and player.pickles > 0:
         print("Hey: You've got to sell your pickles RIGHT NOW if you don't wanna go brankrupt!")
-        input("\nPress enter to continue.")
     else:
         pass
                 
@@ -337,7 +335,8 @@ def newDay():
     s(0.3)
     print("Pickles : ", G, f"{player.pickles} ", END)  
     s(0.3)
-    print("Seeds : ", G, f"{player.seeds}", END)     
+    print("Seeds : ", G, f"{player.seeds}", END)   
+    checkDebt()  
     if planted.phase7 != 0:
         s(0.5)
         print("\nYou have ", G, planted.phase7, END, " pickles ready to be harvested !\nAnd you have currently ", G, planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6, END, "pickles growing.")
