@@ -16,7 +16,7 @@ def clear(): # Cross-platform console clearer
     cmd("cls")
 
 def w():
-    s(0.1)
+    s(0.2)
 
 """ ANSI color codes """
 BLACK = "\033[0;30m"
@@ -79,8 +79,32 @@ def choose():
     return x
 
 class events:
-    # Maladie ??
-    events = ["events.extraSeeds()", "events.storm()", "events.festival()", "events.stocksMarketUp()", "events.stocksMarketDown()"]
+    events = ["events.disease()" "events.extraSeeds()", "events.storm()", "events.festival()", "events.stocksMarketUp()", "events.stocksMarketDown()"]
+    
+    def disease():
+        print("Oh no!\n It looks like your growing pickles have all been infected by a disease.\nIt would be illegal to not destroy your pickles, but the government might not find out about it.\nYou've gotta choose :")
+        ch = input("1 : Keep my infected pickles\n2 : Ask the government for help to destroy them\n> ")
+        if ch == "1":
+            print("You chose to keep your pickles.")
+            if randint(0, 1) == 1:
+                print("And you got away with it!\nNow, try not thinking too much about the diarrhea people will get by eating your pickles.")
+                input("\nPress enter to continue./")
+            else:
+                print("But the government found out!\nYou've got to pay a fine of $5")
+                player.money -= 5
+                input("\nPress enter to continue./")
+        else:
+            print("You chose to destroy your pickles with the help of the government\nThey gave you $10 so you can buy seeds again")
+            planted.phase1 = 0
+            planted.phase2 = 0
+            planted.phase3 = 0
+            planted.phase4 = 0
+            planted.phase5 = 0
+            planted.phase6 = 0
+            planted.phase7 = 0
+            player.money += 10
+            input("\nPress enter to continue./")
+    
     def storm():
         print("\nOh no !\n", G, "50%", END, "of your growing pickles got destroyed because of a storm")
         planted.phase1 = int(planted.phase1 / 2)
@@ -102,7 +126,7 @@ class events:
         wage = randint(20, 60)
         print("\nYay ! ")
         print("Today is the", player.festNbr, "th Pickles Festival of ", choose(), " !")
-        print("They invited you to hold a booth for", G, "$" + wage, END, " !")
+        print("They invited you to hold a booth for", G, "$" + str(wage), END, " !")
         player.money += wage
         input("\nPress enter to continue./")
 
@@ -155,10 +179,13 @@ def load(name):
         from replit import db
     except:
         pass
-
     player.money = db["MNY_"+name]
     player.pickles = db["PCK_"+name]
     player.seeds = db["SDS_"+name]
+
+    del db["MNY_"+name]
+    del db["PCK_"+name]
+    del db["SDS_"+name]
 
     print("\nYou've loaded the game with the name ", G, name, END, " !")
     
@@ -260,7 +287,21 @@ def sell(amount):
                 print("\nOk, maybe another day!")
                 pass
 
-        
+def checkDebt():
+    if player.money <= 0 and player.pickles == 0 and player.seeds == 0:
+        print("Your pickle farm went bankrupt.\nYou don't have anymore money, or pickles, or seeds.\nYou will have to start a new career in another industry.")
+        print("\nY O U     L O S T")
+        input("\n\nPress enter to quit./")
+        quit()
+    elif player.money <= 0 and player.pickles == 0 and player.seeds > 0:
+        print("Hey! You've got to plant your seeds RIGHT NOW if you don't wanna go bankrupt!")
+        input("\nPress enter to continue.")
+    elif player.money <= 0 and player.pickles > 0:
+        print("Hey: You've got to sell your pickles RIGHT NOW if you don't wanna go brankrupt!")
+        input("\nPress enter to continue.")
+    else:
+        pass
+                
     
 def newDay():
     """
@@ -291,11 +332,11 @@ def newDay():
     c = player.day
     print("\nDay : ", G, c, END)       
     print("="*len("Day : "+str(c)))
-    s(0.5)
+    s(0.3)
     print(G, player.money, END, "$")
-    s(0.5)
+    s(0.3)
     print("Pickles : ", G, f"{player.pickles} ", END)  
-    s(0.5)
+    s(0.3)
     print("Seeds : ", G, f"{player.seeds}", END)     
     if planted.phase7 != 0:
         s(0.5)
@@ -407,10 +448,10 @@ def newDay():
 
 clear()
 
-print("Pickle")
+print("Pickle", end=" ")
 w()
 print("Farm")
-print("====")
+print("=" * len("Pickle Farm"))
 w()
 print("\n© canard 2023\n")
 
