@@ -57,6 +57,8 @@ class player:
     festNbr = 0
     a = 5
     b = 15
+    inDebt = False
+    daysInDebt = 0
 
     class workers:
         types = ["Salesmen", "Peasants"]
@@ -303,7 +305,7 @@ def sell(amount):
 
     if player.pickles != 0:    
         if amount == "all":
-            ch = input("\nAre you sure you want to sell your pickles? > ")
+            ch = input("\nAre you sure you want to sell your pickles? (yes/no) > ")
             
             if ch == "yes":
                 player.money += (player.pickles*sellPrice)
@@ -332,29 +334,45 @@ def sell(amount):
                 print("\nOk, maybe another day!")
                 pass
 
+def bankrupt():
+    print("Your pickle farm went bankrupt.\nYou will have to start a new career in another industry.")
+    print("\nY O U     L O S T")
+    input("\n\nPress enter to quit./")
+    quit()
+
 def checkDebt():
     if player.money <= 0 and player.pickles == 0 and player.seeds == 0 and planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6+planted.phase7 == 0:
-        print("Your pickle farm went bankrupt.\nYou don't have anymore money, or pickles, or seeds.\nYou will have to start a new career in another industry.")
-        print("\nY O U     L O S T")
-        input("\n\nPress enter to quit./")
-        quit()
+        bankrupt()
     elif player.money <= 0 and player.pickles == 0 and player.seeds > 0:
         print("Hey! You've got to plant your seeds RIGHT NOW if you don't wanna go bankrupt!")
     elif player.money <= 0 and player.pickles > 0:
         print("Hey: You've got to sell your pickles RIGHT NOW if you don't wanna go brankrupt!")
     else:
-        pass
-                
+        if player.money < 0:
+            player.inDebt = True
+            player.daysInDebt += 1
+        elif player.money >= 0:
+            player.inDebt = False
+            player.daysInDebt = 0
+
+def checkDebtTime():
+    if player.inDebt and player.daysInDebt >= 15:
+        bankrupt()
+    elif player.inDebt:    
+        print(f"You're in DEBT !\nYou have {15-player.daysInDebt} days left before going bankrupt.")   
+    else:
+        pass 
     
 def newDay():
     """
     Create a new day
     """
     global sellPrice
-    event = randint(1, 6)
+    event = randint(1, 4)
+    #print(event, player.day, player.week)
     sellPrice = randint(player.a, player.b)
     #print(event) #
-    if event == 3 and player.day > 0:
+    if event == 2 and player.day > 0 and player.week >= 1:
         eval(choice(events.events))
     print("\n\n")
     dayEnded = False
@@ -387,6 +405,7 @@ def newDay():
     s(0.3)
     print("Seeds : ", G, f"{player.seeds}", END)   
     checkDebt() 
+    checkDebtTime()
     if player.workers.peasants.nbr != 0:
         harvest("all", mode="worker")
     if planted.phase7 != 0:
