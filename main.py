@@ -241,7 +241,19 @@ def buySeeds(amount, seedPrice):
         player.seeds += amount
         print("\nYou bought ", G, amount, END, " seeds !\nYou now have ", G, player.seeds, END, "seed(s) and ", G, player.money, END, "$.")
 
-def plant(amount):
+def plant(amount, mode="player"):
+    if mode == "worker":
+        if player.seeds <= player.workers.peasants.nbr:
+            planted.phase1 += player.seeds
+            print("Your peasants planted ", G, player.seeds, END, " seeds today.")
+            player.seeds = 0
+            
+        else:
+            planted.seeds -= player.workers.peasants.nbr
+            planted.phase1 += player.workers.peasants.nbr
+            print("Your peasants planted ", G, player.workers.peasants.nbr, END, " seeds today.")
+    
+            
     if player.seeds == 0:
         print("\nYou don't have any seeds!\n")
         pass
@@ -354,8 +366,8 @@ def newDay():
     event = randint(1, 6)
     sellPrice = randint(player.a, player.b)
     #print(event) #
-    if event == 3 and player.day > 0:
-        eval(choice(events.events))
+    #if event == 3 and player.day > 0:
+        #eval(choice(events.events))
     print("\n\n")
     dayEnded = False
     if player.day % 7 == 0 and player.day != 0:
@@ -389,6 +401,7 @@ def newDay():
     checkDebt() 
     if player.workers.peasants.nbr != 0:
         harvest("all", mode="worker")
+        plant("all", mode="worker")
     if planted.phase7 != 0:
         s(0.5)
         print("\nYou have ", G, planted.phase7, END, " pickles ready to be harvested !\nAnd you have currently ", G, planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6, END, "pickles growing.")
@@ -424,6 +437,8 @@ def newDay():
         if "buy seeds" in ch.lower():
             try:
                 buySeeds(int(ch[10:]), 5)
+                if player.workers.peasants.nbr != 0:
+                    plant("all", mode="worker")
             except ValueError:
                 if ch[10:] == "":
                     print("\nPlease enter a valid amount!")
@@ -439,8 +454,8 @@ def newDay():
 
         if ch == "hire":
             print("\nHIRE\n====")
-            print("\n[1] Peasants : harvest and plant your crops (1 peasant = 1 seed harvested/planted)")
-            print("[2] Salesmen : sell your pickles")
+            print("\n[1] Peasants : harvest and plant your crops (1 peasant = 1 seed harvested/planted) [10$ hiring fee/peasant]")
+            print("[2] Salesmen : sell your pickles [15$ hiring fee/salesmen]")
             t = input("\n What type do you wanna hire ? ")
             hire(input("How much workers do you wanna hire ? "), t)
                         
