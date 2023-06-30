@@ -52,12 +52,22 @@ class player:
     pickles = 0
     seeds = 0
     day = 0
+    week = 1
     picklesType = "basic"
     festNbr = 0
-
     a = 5
     b = 15
 
+    class workers:
+        types = ["Salesmen", "Peasants"]
+
+        class peasants:
+            nbr = 0
+            price = 10
+        
+        class salesmen:
+            nbr = 0
+            price = 15
 
 class planted:
     phase1 = 0
@@ -71,6 +81,11 @@ class planted:
     growing = phase1+phase2+phase3+phase4+phase5+phase6
 
 sellPrice = 0
+
+def newWeek():
+    salary = player.workers.peasants.price * player.workers.peasants.nbr + player.workers.salesmen.price * player.workers.salesmen.nbr
+    print("You paid ", G, salary, END, " for your workers.")
+    player.money -= salary
 
 def choose():
     cities = ["Montgomery", "Juneau", "Phoenix", "Little Rock", "Sacramento", "Denver", "Hartford", "Dover", "Tallahassee", "Atlanta", "Honolulu", "Boise", "Springfield", "Indianapolis", "Des Moines", "Topeka", "Frankfort", "Baton Rouge", "Augusta"]
@@ -188,7 +203,26 @@ def load(name):
     del db["SDS_"+name]
 
     print("\nYou've loaded the game with the name ", G, name, END, " !")
-    
+
+def hire(amount, type):
+    if type == "1":
+        if player.money <= player.workers.peasants.price * int(amount):
+            print("\nYou don't have the money to pay the hiring fee !")
+        
+        else:
+            print("\nYou hired ", G,  amount, END, " peasants for ", G, player.workers.peasants.price * int(amount), END, " $ !")
+            
+            player.workers.peasants.nbr += int(amount)
+            print("In total, you'll pay ", G, player.workers.peasants.price * player.workers.peasants.nbr + player.workers.salesmen.price * player.workers.salesmen.nbr, END, " $ each week for your workers !")
+    elif type == "2":
+        if player.money <= player.workers.peasants.price * int(amount):
+            print("\nYou don't have the money to pay the hiring fee !")
+        
+        else:
+            print("\nYou hired ", G,  amount, END, " salesmen for ", G, player.workers.peasants.price * int(amount), END, " $ !")
+            player.workers.salesmen.nbr += int(amount)
+            print("In total, you'll pay ", G, player.workers.peasants.price * player.workers.peasants.nbr + player.workers.salesmen.price * player.workers.salesmen.nbr, END, " $ each week for your workers !")
+
 def crops():
     print("\n• Tomorrow's crop : ", G, planted.phase6, END)
     print("• Crops in 2 days : ", G, planted.phase5, END)
@@ -229,7 +263,18 @@ def plant(amount):
             print("\nYou planted ", G, amount, END, " pickles !")  
             print("You now have ", G, planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6, END, " pickles growing.")
 
-def harvest(amount):
+def harvest(amount, mode="player"):
+    if mode == "worker":
+        if planted.phase7 <= player.workers.peasants.nbr:
+            player.pickles += planted.phase7
+            print("Your peasants harvested ", G, planted.phase7, END, " pickles today.")
+            planted.phase7 = 0
+            
+        else:
+            planted.phase7 -= player.workers.peasants.nbr
+            player.pickles += player.workers.peasants.nbr
+            print("Your peasants harvested ", G, player.workers.peasants.nbr, END, " pickles today.")
+        
     if planted.phase7 == 0:
         print("\nYou don't have any pickle ready to be harvested!\n")
         pass
@@ -313,6 +358,11 @@ def newDay():
         eval(choice(events.events))
     print("\n\n")
     dayEnded = False
+    if player.day % 7 == 0 and player.day != 0:
+        player.week += 1
+        isNewWeek = True
+        player.day = 0
+        newWeek()
     player.day += 1
     # Growing pickles
     planted.phase7 += planted.phase6
@@ -328,7 +378,7 @@ def newDay():
     planted.phase2 += planted.phase1
     planted.phase1 = 0
     c = player.day
-    print("\nDay : ", G, c, END)       
+    print("\nDay ", G, c, END, " of week ", G, player.week, END)       
     print("="*len("Day : "+str(c)))
     s(0.3)
     print(G, player.money, END, "$")
@@ -336,7 +386,9 @@ def newDay():
     print("Pickles : ", G, f"{player.pickles} ", END)  
     s(0.3)
     print("Seeds : ", G, f"{player.seeds}", END)   
-    checkDebt()  
+    checkDebt() 
+    if player.workers.peasants.nbr != 0:
+        harvest("all", mode="worker")
     if planted.phase7 != 0:
         s(0.5)
         print("\nYou have ", G, planted.phase7, END, " pickles ready to be harvested !\nAnd you have currently ", G, planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6, END, "pickles growing.")
@@ -384,6 +436,13 @@ def newDay():
                 else:
                     for a in player.inv:
                         print(a, ", ")
+
+        if ch == "hire":
+            print("\nHIRE\n====")
+            print("\n[1] Peasants : harvest and plant your crops (1 peasant = 1 seed harvested/planted)")
+            print("[2] Salesmen : sell your pickles")
+            t = input("\n What type do you wanna hire ? ")
+            hire(input("How much workers do you wanna hire ? "), t)
                         
         if ch.startswith("plant"):
             try:
