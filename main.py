@@ -96,11 +96,18 @@ def choose():
     return x
 
 class events:
-    evs = ["events.disease()", "events.extraSeeds()", "events.storm()", "events.festival()", "events.stocksMarketUp()", "events.stocksMarketDown()", "events.taxes"]
+    evs = ["events.disease()", # Negative
+           "events.extraSeeds()", # Positive
+           "events.storm()", # Negative
+           "events.festival()", # Positive
+           "events.stocksMarketDown()", # Negative
+           "events.stocksMarketUp()", # Positive
+           "events.taxes()", # Negative
+           "events.commercial()"] # Positive
     
     def disease():
         print("Oh no!\n It looks like your growing pickles have all been infected by a disease.\nIt would be illegal to not destroy your pickles, but the government might not find out about it.\nYou've gotta choose :")
-        ch = input("1 : Keep my infected pickles\n2 : Ask the government for help to destroy them\n> ")
+        ch = input("[1] Keep my infected pickles\n[2] Ask the government for help to destroy them\n> ")
         if ch == "1":
             print("You chose to keep your pickles.")
             if randint(0, 1) == 1:
@@ -180,6 +187,12 @@ class events:
             print("\nHey hey hey !\nIt's taxes time !\nYou owe ", G, "$", toPay, END, "to the government\nAnd you're gonna pay it because you're a good citizen !")
             input("\nPress enter to pay./")
             player.money -= toPay
+    
+    def commercial():
+        print("Hurray!\nThe brand \"Richard's Pickles\", a famous pickle brand, chose YOUR pickles for their new commercial!")
+        print("They paid you", G, "$50", END, ".")
+        player.money += 50
+        input("Press enter to continue./")
         
 def save(name):
     
