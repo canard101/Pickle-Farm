@@ -96,7 +96,7 @@ def choose():
     return x
 
 class events:
-    events = ["events.disease()" "events.extraSeeds()", "events.storm()", "events.festival()", "events.stocksMarketUp()", "events.stocksMarketDown()"]
+    evs = ["events.disease()", "events.extraSeeds()", "events.storm()", "events.festival()", "events.stocksMarketUp()", "events.stocksMarketDown()", "events.taxes"]
     
     def disease():
         print("Oh no!\n It looks like your growing pickles have all been infected by a disease.\nIt would be illegal to not destroy your pickles, but the government might not find out about it.\nYou've gotta choose :")
@@ -132,7 +132,7 @@ class events:
         planted.phase6 = int(planted.phase6 / 2)
         planted.phase7 = int(planted.phase7 / 2)
         left_pickles = planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6+planted.phase7
-        print("You now have", G, left_pickles, END, "left pickles...")
+        print("You now have", G, left_pickles, END, "left growing pickles...")
         print("\nBUT !  The government is ready to help you !\nSo they gave you", G, "$5.",  END)
         player.money += 5
         del left_pickles
@@ -160,6 +160,10 @@ class events:
         sub = randint(1, 15)
         player.a -= sub
         player.b -= sub
+        if player.a <= 0:
+            player.a = 1
+        if player.b <= 0:
+            player.b = 1
         print("\nOh no !\nThe pickles stocks market went down...\nNo one wants to buy pickles for more than",G, "$" + str(player.b), END, "now.\nYou can now sell your pickles in a range from", G, "$" + str(player.a), END, "to", G,  "$" + str(player.b), END)
         input("\nPress enter to continue./")
         
@@ -208,12 +212,13 @@ def load(name):
 
 def hire(amount, type):
     if type == "1":
-        if player.money <= player.workers.peasants.price * int(amount):
+        if player.money < player.workers.peasants.price * int(amount):
             print("\nYou don't have the money to pay the hiring fee !")
         
         else:
             print("\nYou hired ", G,  amount, END, " peasants for ", G, player.workers.peasants.price * int(amount), END, " $ !")
             
+            player.money -= player.workers.peasants.price * int(amount)
             player.workers.peasants.nbr += int(amount)
             print("In total, you'll pay ", G, player.workers.peasants.price * player.workers.peasants.nbr + player.workers.salesmen.price * player.workers.salesmen.nbr, END, " $ each week for your workers !")
     elif type == "2":
@@ -222,6 +227,7 @@ def hire(amount, type):
         
         else:
             print("\nYou hired ", G,  amount, END, " salesmen for ", G, player.workers.peasants.price * int(amount), END, " $ !")
+            player.money -= layer.workers.peasants.price * int(amount)
             player.workers.salesmen.nbr += int(amount)
             print("In total, you'll pay ", G, player.workers.peasants.price * player.workers.peasants.nbr + player.workers.salesmen.price * player.workers.salesmen.nbr, END, " $ each week for your workers !")
 
@@ -251,7 +257,7 @@ def plant(amount, mode="player"):
             player.seeds = 0
             
         else:
-            planted.seeds -= player.workers.peasants.nbr
+            planted.seeds -= player.workers.peasants.nbr # ERROR : planted.seeds does not exist
             planted.phase1 += player.workers.peasants.nbr
             print("Your peasants planted ", G, player.workers.peasants.nbr, END, " seeds today.")
     
@@ -334,11 +340,11 @@ def sell(amount):
             pass
             
         else:
-            ch = input(f"\nAre you sure you want to sell {amount} pickles? > ")
+            ch = input(f"\nAre you sure you want to sell {amount} pickles? (yes/no) > ")
             
             if ch == "yes":
-                player.money += (player.pickles*sellPrice)
-                print("\nYou sold ", G, player.pickles, END, " pickle(s) !")
+                player.money += (int(amount)*sellPrice)
+                print("\nYou sold ", G, amount, END, " pickle(s) !")
                 player.pickles -= int(amount)
                 print("You now have $", G, player.money, END, " and ", G, player.pickles, END, " pickle(s).")
                 
@@ -353,6 +359,13 @@ def bankrupt():
     quit()
 
 def checkDebt():
+    if player.money < 0:
+        player.inDebt = True
+        player.daysInDebt += 1
+    elif player.money >= 0:
+        player.inDebt = False
+        player.daysInDebt = 0
+
     if player.money <= 0 and player.pickles == 0 and player.seeds == 0 and planted.phase1+planted.phase2+planted.phase3+planted.phase4+planted.phase5+planted.phase6+planted.phase7 == 0:
         bankrupt()
     elif player.money <= 0 and player.pickles == 0 and player.seeds > 0:
@@ -360,12 +373,7 @@ def checkDebt():
     elif player.money <= 0 and player.pickles > 0:
         print("Hey: You've got to sell your pickles RIGHT NOW if you don't wanna go brankrupt!")
     else:
-        if player.money < 0:
-            player.inDebt = True
-            player.daysInDebt += 1
-        elif player.money >= 0:
-            player.inDebt = False
-            player.daysInDebt = 0
+        pass
 
 def checkDebtTime():
     if player.inDebt and player.daysInDebt >= 15:
@@ -385,7 +393,7 @@ def newDay():
     sellPrice = randint(player.a, player.b)
     #print(event) #
     if event == 2 and player.day > 0 and player.week >= 1:
-        eval(choice(events.events))
+        eval(choice(events.evs))
     print("\n\n")
     dayEnded = False
     if player.day % 7 == 0 and player.day != 0:
